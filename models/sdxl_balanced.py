@@ -18,6 +18,7 @@ from diffusers.image_processor import PipelineImageInput
 from diffusers.utils.torch_utils import is_compiled_module, is_torch_version
 from diffusers.pipelines.stable_diffusion_xl.pipeline_stable_diffusion_xl import retrieve_timesteps,rescale_noise_cfg
 from typing import Union, Tuple
+from functools import reduce
 
 from PIL import Image
 
@@ -277,7 +278,7 @@ class StableDiffusionXLBalancedPipeline:
         # 5. Prepare latent variables
         num_channels_latents = self.pipeline.unet.config.in_channels
         latents = self.pipeline.prepare_latents(
-            1 + num_images_per_prompt,
+            1 + (len(prompt) - 1) * num_images_per_prompt,
             num_channels_latents,
             height,
             width,
@@ -315,10 +316,14 @@ class StableDiffusionXLBalancedPipeline:
         else:
             negative_add_time_ids = add_time_ids
         
-        prompt_embeds = torch.stack([prompt_embeds[0]] + [prompt_embeds[1]] * num_images_per_prompt)
-        negative_prompt_embeds = torch.stack([negative_prompt_embeds[0]] + [negative_prompt_embeds[1]] * num_images_per_prompt)
-        negative_pooled_prompt_embeds = torch.stack([negative_pooled_prompt_embeds[0]] + [negative_pooled_prompt_embeds[1]] * num_images_per_prompt)
-        add_text_embeds = torch.stack([add_text_embeds[0]] + [add_text_embeds[1]] * num_images_per_prompt)
+        # prompt_embeds = torch.stack([prompt_embeds[0]] + [prompt_embeds[1]] * num_images_per_prompt)
+        prompt_embeds = torch.stack([prompt_embeds[0]] + reduce(lambda x, y: x + y, [[prompt_embeds[i]] * num_images_per_prompt for i in range(1, len(prompt_embeds))]))
+        # negative_prompt_embeds = torch.stack([negative_prompt_embeds[0]] + [negative_prompt_embeds[1]] * num_images_per_prompt)
+        negative_prompt_embeds = torch.stack([negative_prompt_embeds[0]] + reduce(lambda x, y: x + y, [[negative_prompt_embeds[i]] * num_images_per_prompt for i in range(1, len(negative_prompt_embeds))]))
+        # negative_pooled_prompt_embeds = torch.stack([negative_pooled_prompt_embeds[0]] + [negative_pooled_prompt_embeds[1]] * num_images_per_prompt)
+        negative_pooled_prompt_embeds = torch.stack([negative_pooled_prompt_embeds[0]] + reduce(lambda x, y: x + y, [[negative_pooled_prompt_embeds[i]] * num_images_per_prompt for i in range(1, len(negative_pooled_prompt_embeds))]))
+        # add_text_embeds = torch.stack([add_text_embeds[0]] + [add_text_embeds[1]] * num_images_per_prompt)
+        add_text_embeds = torch.stack([add_text_embeds[0]] + reduce(lambda x, y: x + y, [[add_text_embeds[i]] * num_images_per_prompt for i in range(1, len(add_text_embeds))]))
 
         prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds], dim=0)
         add_text_embeds = torch.cat([negative_pooled_prompt_embeds, add_text_embeds], dim=0)
@@ -326,7 +331,7 @@ class StableDiffusionXLBalancedPipeline:
         
         prompt_embeds = prompt_embeds.to(device)
         add_text_embeds = add_text_embeds.to(device)
-        add_time_ids = add_time_ids.to(device).repeat(1 + num_images_per_prompt, 1)
+        add_time_ids = add_time_ids.to(device).repeat(1 + num_images_per_prompt * (len(prompt) - 1), 1)
         batch_size = 1 + num_images_per_prompt
 
         if ip_adapter_image is not None:
