@@ -7,27 +7,21 @@ import os
 import argparse
 import torch
 
-from utils import generate_file_name, get_dummy_ctrl
-from models import create_infer_model, load_controlnet, load_ddpm
+from utils import generate_file_name
+from models import create_infer_model, load_ddpm
 
 NUM_SELF_ATT_LAYERS = 70
-DUMMY_CONTROL_TYPE = "canny"
 
 def main(args):
     device = 'cuda'
 
     # Load DDPM and Handler
-    controlnet = load_controlnet(DUMMY_CONTROL_TYPE, device=device)  # Initialzied but not used
-    pipeline = load_ddpm(controlnet, device=device)
-    infer_pipeline = create_infer_model(pipeline, num_style_layers=args.num_style_layers)
+    pipeline = load_ddpm(device=device)
+    infer_pipeline = create_infer_model(pipeline, args.num_style_layers, controlnet_model=False)
     
     # Init output path
     args.output_path = os.path.join(args.output_path, 'text', str(args.seed))
     os.makedirs(args.output_path, exist_ok=True)
-
-    # Generate Control Image
-    controlnet_conditioning_scale = 0.0
-    control_img = get_dummy_ctrl()
 
     # Initialize DDPM parameters
     torch.manual_seed(args.seed)
@@ -47,9 +41,7 @@ def main(args):
     
     # Run Pipeline
     images = infer_pipeline([reference_prompt, target_prompt],
-                            control_image=control_img,
                             num_inference_steps=args.num_inference_steps,
-                            controlnet_conditioning_scale=controlnet_conditioning_scale,
                             num_images_per_prompt=args.num_output_imgs,
                             latents=latents)
     
