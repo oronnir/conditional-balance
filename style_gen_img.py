@@ -7,7 +7,7 @@ import os
 import argparse
 import torch
 
-from utils import generate_file_name
+from utils import generate_file_name, initialize_latents
 from models import create_infer_model, load_ddpm
 
 NUM_SELF_ATT_LAYERS = 70
@@ -25,24 +25,14 @@ def main(args):
 
     # Initialize DDPM parameters
     torch.manual_seed(args.seed)
-    # target_prompt = f"{args.content_prompt}, {args.style_prompt}"
     target_prompts = [f"{content_prompt}, {args.style_prompt}" for content_prompt in args.content_prompts]
     reference_prompt = f"{args.reference_prompt}, {args.style_prompt}"
     prompts = [reference_prompt] + target_prompts
 
     latents = None
     if args.initialize_latents:
-        latents = torch.randn(2, 4, 128, 128).to(pipeline.unet.dtype)
-        latents[1:] = torch.randn(1, 4, 128, 128).to(pipeline.unet.dtype)
+        latents = initialize_latents(args.num_images_per_prompt, num_controls=1, dtype=pipeline.unet.dtype)
 
-        additional_latents = []
-        if args.num_images_per_prompt > 1:
-            for _ in range(args.num_images_per_prompt - 1):
-                additional_latents.append(torch.randn(1, 4, 128, 128).to(pipeline.unet.dtype))
-            latents = torch.cat([latents, torch.cat(additional_latents, dim=0)], dim=0)
-        for _ in range(2, len(prompts)):
-            latents = torch.cat([latents, latents[-args.num_images_per_prompt:]], dim=0)
-    
     # Run Pipeline
     images = infer_pipeline(prompts,
                             num_inference_steps=args.num_inference_steps,
@@ -59,7 +49,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--seed")
-    parser.add_argument('--content_prompts', nargs='+', type=str, help='List of numbers')
+    parser.add_argument('--content_prompts', nargs='+', type=str, help='List of prompts to generate')
     parser.add_argument("--style_prompt", type=str)
     parser.add_argument("--reference_prompt", type=str)
     parser.add_argument('--lambda_s', default=0.43, type=float)

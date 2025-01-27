@@ -23,6 +23,8 @@ from PIL import Image
 T = torch.Tensor
 TN = Union[T, None]
 
+from functools import reduce
+
 NUM_REF_IMAGES = 1
 
 class StableDiffusionXLControlNetBalancedPipeline:
@@ -75,6 +77,7 @@ class StableDiffusionXLControlNetBalancedPipeline:
     ) -> list[Image]:
         
         controlnet = self.pipeline.controlnet._orig_mod if is_compiled_module(self.pipeline.controlnet) else self.pipeline.controlnet
+        num_control_imgs = len(control_image) if type(control_image) is list else 1
 
         # align format for control guidance
         if not isinstance(control_guidance_start, list) and isinstance(control_guidance_end, list):
@@ -89,6 +92,9 @@ class StableDiffusionXLControlNetBalancedPipeline:
             )
 
         # 1. Check inputs. Raise error if not correct
+        if type(control_image) is list:
+            control_image = [control_image[0]] + control_image  # Add dummy control image
+
         self.pipeline.check_inputs(
             prompt=prompt,
             prompt_2=prompt_2,
@@ -105,6 +111,9 @@ class StableDiffusionXLControlNetBalancedPipeline:
             control_guidance_end=control_guidance_end,
             callback_on_step_end_tensor_inputs=callback_on_step_end_tensor_inputs,
         )
+
+        if type(control_image) is list:
+            control_image = control_image[1:]  # Remove dummy control image
 
         self.pipeline._guidance_scale = guidance_scale
 
@@ -157,7 +166,9 @@ class StableDiffusionXLControlNetBalancedPipeline:
                 guess_mode=False,
             )
             height, width = control_image.shape[-2:]
-            control_image = torch.stack([control_image[0]] * num_images_per_prompt + [control_image[1]] * num_images_per_prompt)  #TODO: NEW
+            control_image = torch.stack(reduce(lambda x, y: x + y, [[control_image[i]] * num_images_per_prompt for i in range(len(control_image))]))  #TODO: NEW
+
+            # control_image = torch.stack([control_image[0]] * num_images_per_prompt + [control_image[1]] * num_images_per_prompt)  #TODO: NEW
         else:
             assert False
 
@@ -166,9 +177,10 @@ class StableDiffusionXLControlNetBalancedPipeline:
         timesteps = self.pipeline.scheduler.timesteps
 
         # 6. Prepare latent variables
+        batch_size = NUM_REF_IMAGES + (num_images_per_prompt * (num_control_imgs))
         num_channels_latents = self.pipeline.unet.config.in_channels
         latents = self.pipeline.prepare_latents(
-            batch_size= NUM_REF_IMAGES + num_images_per_prompt,
+            batch_size=batch_size,
             num_channels_latents=num_channels_latents,
             height=height,
             width=width,
@@ -225,10 +237,11 @@ class StableDiffusionXLControlNetBalancedPipeline:
         else:
             negative_add_time_ids = add_time_ids
 
-        prompt_embeds = torch.stack([prompt_embeds[0]] + [prompt_embeds[1]] * num_images_per_prompt)
-        negative_prompt_embeds = torch.stack([negative_prompt_embeds[0]] + [negative_prompt_embeds[1]] * num_images_per_prompt)
-        negative_pooled_prompt_embeds = torch.stack([negative_pooled_prompt_embeds[0]] + [negative_pooled_prompt_embeds[1]] * num_images_per_prompt)
-        add_text_embeds = torch.stack([add_text_embeds[0]] + [add_text_embeds[1]] * num_images_per_prompt)
+        # prompt_embeds = torch.stack([prompt_embeds[0]] + [prompt_embeds[1]] * num_images_per_prompt)
+        prompt_embeds = torch.stack([prompt_embeds[0]] + reduce(lambda x, y: x + y, [[prompt_embeds[i]] * num_images_per_prompt for i in range(1, len(prompt_embeds))]))
+        negative_prompt_embeds = torch.stack([negative_prompt_embeds[0]] + reduce(lambda x, y: x + y, [[negative_prompt_embeds[i]] * num_images_per_prompt for i in range(1, len(negative_prompt_embeds))]))
+        negative_pooled_prompt_embeds = torch.stack([negative_pooled_prompt_embeds[0]] + reduce(lambda x, y: x + y, [[negative_pooled_prompt_embeds[i]] * num_images_per_prompt for i in range(1, len(negative_pooled_prompt_embeds))]))
+        add_text_embeds = torch.stack([add_text_embeds[0]] + reduce(lambda x, y: x + y, [[add_text_embeds[i]] * num_images_per_prompt for i in range(1, len(add_text_embeds))]))
 
         prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds], dim=0)
         add_text_embeds = torch.cat([negative_pooled_prompt_embeds, add_text_embeds], dim=0)
@@ -236,8 +249,7 @@ class StableDiffusionXLControlNetBalancedPipeline:
 
         prompt_embeds = prompt_embeds.to(device)
         add_text_embeds = add_text_embeds.to(device)
-        add_time_ids = add_time_ids.to(device).repeat(NUM_REF_IMAGES + num_images_per_prompt, 1)
-        batch_size = NUM_REF_IMAGES + num_images_per_prompt
+        add_time_ids = add_time_ids.to(device).repeat(NUM_REF_IMAGES + (num_images_per_prompt * (num_control_imgs)), 1)
 
         # 8. Denoising loop
         num_warmup_steps = len(timesteps) - num_inference_steps * self.pipeline.scheduler.order
