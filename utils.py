@@ -21,7 +21,7 @@ def get_depth_ctrl(content_image_path, device):
 
 def get_canny_ctrl(content_image_path, canny_params):
     if os.path.isdir(content_image_path):
-        input_imgs = [Image.open(os.path.join(content_image_path, file)).resize((1024, 1024)) for file in os.listdir(content_image_path)]
+        input_imgs = [Image.open(os.path.join(content_image_path, file)).resize((1024, 1024)) for file in sorted(os.listdir(content_image_path))]
         control_img = [prepare_canny_image(img, canny_params=canny_params) for img in input_imgs]
     else:
         input_img = Image.open(content_image_path).resize((1024, 1024))
