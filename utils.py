@@ -93,7 +93,7 @@ def prepare_target_prompts(target_prompts, num_controls):
         assert len(target_prompts) == num_controls, f"Number of content prompts should equal to 1 or match the number of input conditional images. Num Prompts: {len(target_prompts)}, Num Control Conditions: {num_controls}"
     return target_prompts
 
-def initialize_latents(num_images_per_prompt, num_controls, dtype):
+def initialize_latents_controlnet(num_images_per_prompt, num_controls, dtype):
     latents = torch.randn(2, 4, 128, 128).to(dtype)
     latents[1] = torch.randn(1, 4, 128, 128).to(dtype)
 
@@ -108,3 +108,15 @@ def initialize_latents(num_images_per_prompt, num_controls, dtype):
             latents = torch.cat([latents, target_latents])
     
     return latents
+
+def initialize_latents(num_prompts, num_images_per_prompt, dtype):
+    latents = torch.randn(2, 4, 128, 128).to(dtype)
+    latents[1:] = torch.randn(1, 4, 128, 128).to(dtype)
+
+    additional_latents = []
+    if num_images_per_prompt > 1:
+        for _ in range(num_images_per_prompt - 1):
+            additional_latents.append(torch.randn(1, 4, 128, 128).to(dtype))
+        latents = torch.cat([latents, torch.cat(additional_latents, dim=0)], dim=0)
+    for _ in range(2, num_prompts):
+        latents = torch.cat([latents, latents[-num_images_per_prompt:]], dim=0)

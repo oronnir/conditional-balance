@@ -9,7 +9,7 @@ import argparse
 import torch
 from PIL import Image
 
-from utils import generate_file_name, get_canny_ctrl, load_control_imgs, initialize_latents, save_control_imgs, prepare_target_prompts
+from utils import generate_file_name, get_canny_ctrl, load_control_imgs, initialize_latents_controlnet, save_control_imgs, prepare_target_prompts
 from models import create_infer_model, load_controlnet, load_ddpm
 
 
@@ -54,7 +54,7 @@ def main(args):
 
     latents = None
     if args.initialize_latents:
-        latents = initialize_latents(args.num_images_per_prompt, num_controls, pipeline.unet.dtype)
+        latents = initialize_latents_controlnet(args.num_images_per_prompt, num_controls, pipeline.unet.dtype)
     
     # Run Pipeline
     images = infer_pipeline(prompts,

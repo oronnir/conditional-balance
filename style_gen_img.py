@@ -31,7 +31,7 @@ def main(args):
 
     latents = None
     if args.initialize_latents:
-        latents = initialize_latents(args.num_images_per_prompt, num_controls=1, dtype=pipeline.unet.dtype)
+        latents = initialize_latents(len(prompts), args.num_images_per_prompt, dtype=pipeline.unet.dtype)
 
     # Run Pipeline
     images = infer_pipeline(prompts,
