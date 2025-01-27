@@ -62,7 +62,7 @@ if __name__ == "__main__":
     
     assert 0 <= args.lambda_s <= NUM_SELF_ATT_LAYERS, "Plase enter a float value in range [0, 1] (ratio) or an int value in range [0, 70] (number of layers for stylization)"
     if 0 < args.lambda_s <= 1:
-        args.num_style_layers = args.lambda_s * NUM_SELF_ATT_LAYERS
+        args.lambda_s = args.lambda_s * NUM_SELF_ATT_LAYERS
     args.num_style_layers = int(args.lambda_s) 
 
     assert args.num_images_per_prompt > 0, f"'num_output_imgs' should be at least 1. Current value: {args.num_images_per_prompt}"

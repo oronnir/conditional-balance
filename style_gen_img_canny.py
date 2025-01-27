@@ -92,7 +92,7 @@ if __name__ == "__main__":
     
     assert 0 <= args.lambda_s <= NUM_SELF_ATT_LAYERS, "Plase enter a float value in range [0, 1] (ratio) or an int value in range [0, 70] (number of layers for stylization)"
     if 0 < args.lambda_s <= 1:
-        args.num_style_layers = args.lambda_s * NUM_SELF_ATT_LAYERS
+        args.lambda_s = args.lambda_s * NUM_SELF_ATT_LAYERS
     args.num_style_layers = int(args.lambda_s)
 
     assert 0 <= args.lambda_t <= NUM_TIMESTEPS, "Plase enter a float value in range [0, 1] for setting the geometric style ration (0-no geometric style, 1-full geometric style)"
