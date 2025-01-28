@@ -120,3 +120,5 @@ def initialize_latents(num_prompts, num_images_per_prompt, dtype):
         latents = torch.cat([latents, torch.cat(additional_latents, dim=0)], dim=0)
     for _ in range(2, num_prompts):
         latents = torch.cat([latents, latents[-num_images_per_prompt:]], dim=0)
+
+    return latents
