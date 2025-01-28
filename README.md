@@ -30,7 +30,7 @@ python style_gen_img.py --seed 25 \
 You can also generate text-conditioned images using more than one text condition:
 ```
 python style_gen_img.py --seed 10 \
-                        --content_prompts "A persian cat" "A St. Bernard dog running on snow" "A black bear wearing sunglasses and on the beach" \
+                        --content_prompts "A persian cat" "A St. Bernard dog running on snow" "A black bear wearing sunglasses on the beach" \
                         --style_prompt "in the style of Vincent van-Gogh" \
                         --reference_prompt "An oil painting" \
                         --lambda_s 0.43 \
