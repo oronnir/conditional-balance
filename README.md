@@ -8,7 +8,18 @@ This is the official repository of the paper "Conditional Balance: Improving Mul
 ![teaser](assets/results_text.png)
 
 # Environment Setup
-Coming Soon...
+We recommend creating a conda environment with the latest library versions. In case issues arise, the library versions used in our experiments are mentioned below.
+```
+conda create -n conditional_balance python=3.11
+conda activate conditional_balance
+
+pip install torch torchvision torchaudio   # version=2.6.0
+pip install accelerate                     # version=1.3.0
+pip install -U diffusers                   # version=0.32.2
+pip install transformers                   # version=4.48.2
+pip install einops                         # version=0.8.0
+pip install opencv-python                  # version=4.11.0
+```
 
 # Inference
 

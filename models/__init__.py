@@ -10,7 +10,7 @@ def create_infer_model(pipeline, num_style_layers, controlnet_model=False, contr
     handler_args = FALSE_SA_ARGS
     handler_cls = get_handler()
 
-    style_stats = torch.load("grading_files/style_layer_grading")
+    style_stats = torch.load("grading_files/style_layer_grading", weights_only=False)
     handler = handler_cls(pipeline, style_stats, num_style_layers)
     handler.register(handler_args)
     
