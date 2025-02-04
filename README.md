@@ -7,6 +7,14 @@ This is the official repository of the paper "Conditional Balance: Improving Mul
 
 ![teaser](assets/results_text.png)
 
+# Updates
+[2025 ?] Conditional Balance's SDXL inference code is officialy released!
+
+### TODOs
+- [x] SDXL balanced inference Code.
+- [ ] Analysis Code
+- [ ] Stable-Diffusion3.5 balanced Inference Code.
+
 # Environment Setup
 We recommend creating a conda environment with the latest library versions. In case issues arise, the library versions used in our experiments are mentioned below.
 ```
