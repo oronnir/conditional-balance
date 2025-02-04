@@ -83,6 +83,7 @@ python style_gen_img_canny.py --seed 42 \
 ![multi_text](assets/multi_canny.png)
 
 
+
 # Citation
 If you found this project helpful in your research, please consider citing our paper.
 ```
@@ -96,3 +97,6 @@ If you found this project helpful in your research, please consider citing our p
       url={https://arxiv.org/abs/2412.19853}, 
 }
 ```
+
+# Acknowledgments
+We wish to thank the authors of [StyleAligned](https://github.com/google/style-aligned) as parts of our code were adopted from thier repository.
