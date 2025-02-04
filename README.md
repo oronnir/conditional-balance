@@ -8,7 +8,7 @@ This is the official repository of the paper "Conditional Balance: Improving Mul
 ![teaser](assets/results_text.png)
 
 # Updates
-[2025 ?] Conditional Balance's SDXL inference code is officialy released!
+[2025 ?] Conditional Balance's SDXL inference code is officially released!
 
 ### TODOs
 - [x] SDXL balanced inference Code.
