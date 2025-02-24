@@ -107,4 +107,4 @@ If you found this project helpful in your research, please consider citing our p
 ```
 
 # Acknowledgments
-We wish to thank the authors of [StyleAligned](https://github.com/google/style-aligned) as parts of our code were adopted from thier repository.
+We wish to thank the authors of [StyleAligned](https://github.com/google/style-aligned) as parts of our code were adopted from their repository.
