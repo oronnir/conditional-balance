@@ -8,6 +8,7 @@ This is the official repository of the paper "Conditional Balance: Improving Mul
 ![teaser](assets/results_text.png)
 
 [Project Page](https://nadavc220.github.io/conditional-balance.github.io/)
+
 [arXiv](https://arxiv.org/abs/2412.19853)
 
 # Updates
