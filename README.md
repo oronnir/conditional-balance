@@ -46,7 +46,7 @@ The following call can be used to generate text-conditioned images:
 python style_gen_img.py --seed 25 \
                         --content_prompts "A tabby cat sitting" \
                         --style_prompt "in the style of John Singer Sargent" \
-                        --reference_prompt "An watercolor painting" \
+                        --reference_prompt "A watercolor painting" \
                         --lambda_s 0.43 \
                         --num_images_per_prompt 1 \
                         --output_path "outputs" \
