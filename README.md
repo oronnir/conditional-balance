@@ -3,13 +3,13 @@
   Improving Multi-Conditioning Trade-Offs in Image Generation <br>
 </h1>
 
+[Project Page](https://nadavc220.github.io/conditional-balance.github.io/)
+
+
 This is the official repository of the paper "Conditional Balance: Improving Multi-Conditioning Trade-Offs in Image Generation" by Nadav Z. Cohen, Oron Nir, and Ariel Shamir.
 
 ![teaser](assets/results_text.png)
 
-[Project Page](https://nadavc220.github.io/conditional-balance.github.io/)
-
-[arXiv](https://arxiv.org/abs/2412.19853)
 
 # Updates
 [2025 April] Conditional Balance's SDXL inference code is officially released!
