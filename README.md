@@ -6,7 +6,7 @@
 <p align='center'>
 <a href="https://nadavc220.github.io/conditional-balance.github.io/"><img src="https://img.shields.io/static/v1?label=Project&message=Website&color=blue"></a>
 <a href="https://www.youtube.com/watch?v=WNRcC-fLXq8"><img src="https://img.shields.io/static/v1?label=YouTube&message=Video&color=orange"></a>
-<a href="https://arxiv.org/abs/2412.19853"><img src="https://img.shields.io/badge/arXiv-2411.14430-b31b1b.svg"></a>
+<a href="https://arxiv.org/abs/2412.19853"><img src="https://img.shields.io/badge/arXiv-2412.19853-b31b1b.svg"></a>
 <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch->=2.4.1-Red?logo=pytorch"></a>
 </p>
 
