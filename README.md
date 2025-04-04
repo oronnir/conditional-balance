@@ -1,5 +1,5 @@
 <h1 align="center">
-  Conditional Balance:  <br>
+  [CVPR 25] Conditional Balance:  <br>
   Improving Multi-Conditioning Trade-Offs in Image Generation <br>
 </h1>
 
@@ -8,7 +8,7 @@ This is the official repository of the paper "Conditional Balance: Improving Mul
 ![teaser](assets/results_text.png)
 
 # Updates
-[2025 ?] Conditional Balance's SDXL inference code is officially released!
+[2025 April] Conditional Balance's SDXL inference code is officially released!
 
 ### TODOs
 - [x] SDXL balanced inference Code.
