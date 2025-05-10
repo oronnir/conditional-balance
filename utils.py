@@ -73,8 +73,11 @@ def generate_file_name(num_style_layers, controlnet_removal_amount, content_imag
     return f_name
 
 def load_control_imgs(path):
-    if os.path.isdir(path):
+    if type(path) is str and os.path.isdir(path):
         ctrl_img = [Image.open(os.path.join(path, file)) for file in os.listdir(path)]
+    elif type(path) is list:
+        print(f'\n\nFound {len(path)} control images\n\n')
+        ctrl_img = [Image.open(p) for p in path]
     else:
         ctrl_img = Image.open(path)
     return ctrl_img

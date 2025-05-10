@@ -364,4 +364,4 @@ class StableDiffusionXLControlNetBalancedPipeline:
 
         # Offload all models
         self.pipeline.maybe_free_model_hooks()
-        return image
+        return image, latents
