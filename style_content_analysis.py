@@ -17,6 +17,42 @@ class Classifier(nn.Module):
         x = x.view(x.size(0), -1)
         return self.classifier(x)
 
+def min_max_scale(tensor):
+    """Scale a tensor to the range [0, 1]."""
+    tensor = (tensor - tensor.min()) / (tensor.max() - tensor.min())
+    return tensor
+
+def load_pt_files(directory):
+    """Load all .pt files in the specified directory as PyTorch tensors."""
+    tensors = {}
+    pts = [os.path.join(directory, fn) for fn in os.listdir(directory) if fn.endswith('.pt')]
+    for file_path in pts:
+        file_name = os.path.basename(file_path)
+        tensor = torch.load(file_path, weights_only=False, map_location='cpu').to(torch.float32)
+        print(f"Loaded tensor {file_name} with shape {tensor.shape}")
+
+        # # run a 2D convolution on the tensor
+        # tensor = torch.nn.functional.conv2d(tensor, torch.ones(1, 1, 3, 3), padding=1)
+
+        # scale tensor to 0-1 range
+        # tensor = (min_max_scale(tensor[0,:,:])*min_max_scale(tensor[2,:,:])-min_max_scale(tensor[1,:,:])*min_max_scale(tensor[3,:,:])).squeeze()
+        tensors[file_name] = tensor
+        
+
+    style_tensors = {}
+    for fn, tensor in tensors.items():
+        artist = os.path.basename(file_path).split("_")[1]
+        if artist == "" or fn.startswith("ref_") or "_\"\"_gen_s0_" in fn:
+            print(f"Skipping tensor {fn} as it does not match the expected naming convention.")
+            continue
+
+        name_parts = os.path.basename(file_path).split("_")
+        style_file_name = f"{name_parts[0]}_\"\"_gen_s0_{name_parts[-1]}"
+        style_pt = tensors[style_file_name]
+        content_num = name_parts[0]
+        style_tensors[(artist, content_num)] = tensor - style_pt
+    return style_tensors
+
 def load_tensors(directory):
     """Load tensors and prepare both style and content labels"""
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -112,7 +148,10 @@ def main():
     directory = "/home/oron_nir/code/balance/conditional-balance/outputs/canny/42/"
     
     print("Loading tensors...")
-    tensors, style_labels, content_labels, styles, contents = load_tensors(directory)
+    # tensors, style_labels, content_labels, styles, contents = load_tensors(directory)
+
+    tensors, style_labels, content_labels, styles, contents = load_pt_files(directory)
+
     print(f"Loaded {len(tensors)} tensors")
     print(f"Number of styles: {len(styles)}")
     print(f"Number of content classes: {len(contents)}")

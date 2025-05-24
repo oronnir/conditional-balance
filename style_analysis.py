@@ -88,6 +88,8 @@ def main():
     # Load data
     print("Loading tensors...")
     tensors, labels, style_names = load_tensors(directory)
+    
+    # Check if the loaded tensors match the expected shape
     print(f"Loaded {len(tensors)} tensors with {len(style_names)} unique styles")
     print(f"Styles found: {style_names}")
     
